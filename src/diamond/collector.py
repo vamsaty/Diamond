@@ -81,6 +81,14 @@ def get_hostname(config, method=None):
             raise DiamondException('Hostname is empty?!')
         return hostname
 
+    # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+    if method == 'host_ip':
+        hostname = socket.gethostbyname(socket.getfqdn()).replace('.', '_')
+        get_hostname.cached_results[method] = hostname
+        if hostname == '':
+            raise DiamondException('Hostip is empty?!')
+        return hostname
+    # THOUGHTSPOT_CUSTOMIZATION_END
     if method == 'fqdn_rev':
         hostname = socket.getfqdn().split('.')
         hostname.reverse()
@@ -236,6 +244,29 @@ class Collector(object):
                 'Both metrics_whitelist and metrics_blacklist specified ' +
                 'in file %s' % configfile)
 
+        # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+        # TODO(Pradeep): Move this out so that the whitelist is read just once
+        # and not once for every collector
+        if self.config.get('whitelist_file', None):
+            lines = []
+            with open(self.config['whitelist_file']) as f:
+                lines = f.read().splitlines()
+            self.config['regex'] = []
+            start = "[["+self.name+"]]"
+            end_regex = "\[\[.*\]\]"
+            comment_regex = "#.*"
+            started = False
+            for line in lines:
+                if not line or re.match(comment_regex, line):
+                    continue
+                if started == False and line == start:
+                    started = True
+                elif started == True:
+                    if re.match(end_regex, line):
+                        break
+                    else:
+                        self.config['regex'].append(line)
+        # THOUGHTSPOT_CUSTOMIZATION_END
         if self.config.get('metrics_whitelist', None):
             self.config['metrics_whitelist'] = re.compile(
                 self.config['metrics_whitelist'])
@@ -316,6 +347,10 @@ class Collector(object):
             virtual machine and should have a different
             root prefix.
         """
+        # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+        if 'no_prefix_and_suffix' in self.config:
+            return name
+        # THOUGHTSPOT_CUSTOMIZATION_END
         if 'path' in self.config:
             path = self.config['path']
         else:
@@ -371,6 +406,17 @@ class Collector(object):
         """
         Publish a metric with the given name
         """
+        # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+        if self.config.get('whitelist_file', None):
+            found = False
+            if self.config['regex']:
+                for regex in self.config['regex']:
+                    if re.search(regex, name, re.IGNORECASE):
+                        found = True
+                        break
+            if found == False:
+                return
+        # THOUGHTSPOT_CUSTOMIZATION_END
         # Check whitelist/blacklist
         if self.config['metrics_whitelist']:
             if not self.config['metrics_whitelist'].match(name):
