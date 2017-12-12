@@ -26,6 +26,8 @@ if platform.architecture()[0] == '64bit':
 else:
     MAX_COUNTER = (2 ** 32) - 1
 
+prefix = 'ts_stat.'
+
 
 def get_hostname(config, method=None):
     """
@@ -143,6 +145,7 @@ def get_hostname(config, method=None):
 
     raise NotImplementedError(config['hostname_method'])
 
+
 get_hostname.cached_results = {}
 
 
@@ -186,6 +189,14 @@ class Collector(object):
 
         self.configfile = None
         self.load_config(configfile, config)
+        # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+        self.metric_count = 0
+        self.metric_publish_count = 0
+        self.class_init_time = time.time()
+        self.run_count = 0
+        self.log.info("Initializing collector: %s with collection freq(s):%s",
+                      self.name, self.config['interval'])
+        # THOUGHTSPOT_CUSTOMIZATION_END
 
     def load_config(self, configfile=None, override_config=None):
         """
@@ -407,6 +418,8 @@ class Collector(object):
         Publish a metric with the given name
         """
         # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+        # Collect monitoring stats for total collected metrics
+        self.metric_count += 1
         if self.config.get('whitelist_file', None):
             found = False
             if self.config['regex']:
@@ -414,7 +427,7 @@ class Collector(object):
                     if re.search(regex, name, re.IGNORECASE):
                         found = True
                         break
-            if found == False:
+            if not found:
                 return
         # THOUGHTSPOT_CUSTOMIZATION_END
         # Check whitelist/blacklist
@@ -441,6 +454,11 @@ class Collector(object):
             self.log.error(('Error when creating new Metric: path=%r, '
                             'value=%r'), path, value)
             raise
+
+        # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+        # Collect monitoring stats for published metrics
+        self.metric_publish_count += 1
+        # THOUGHTSPOT_CUSTOMIZATION_END
 
         # Publish Metric
         self.publish_metric(metric)
@@ -512,9 +530,16 @@ class Collector(object):
         """
         Run the collector unless it's already running
         """
+        global prefix
         try:
-            start_time = time.time()
+            # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+            self.run_count += 1
+            self.log.info("Run number#%s for %s.", self.run_count, self.name)
+            self.metric_count = 0
+            self.metric_publish_count = 0
+            # THOUGHTSPOT_CUSTOMIZATION_END
 
+            start_time = time.time()
             # Collect Data
             self.collect()
 
@@ -527,12 +552,35 @@ class Collector(object):
                 if self.config['measure_collector_time']:
                     metric_name = 'collector_time_ms'
                     metric_value = collector_time
-                    self.publish(metric_name, metric_value)
+                    self.publish(prefix + metric_name, metric_value)
+                    # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+                    # Collect monitoring metrics
+                    self.publish_monitoring_metrics()
+                    # THOUGHTSPOT_CUSTOMIZATION_END
+
         finally:
             # After collector run, invoke a flush
             # method on each handler.
             for handler in self.handlers:
                 handler._flush()
+
+    # THOUGHTSPOT_CUSTOMIZATION_BEGIN
+    def publish_monitoring_metrics(self):
+        global prefix
+        self.log.debug("Publishing monitoring metrics for: %s", self.name)
+
+        self.publish(prefix + 'collector_run_finished_at_ms',
+                     time.time() * 1000)
+        self.publish(prefix + 'collection_frequency_ms',
+                     int(self.config['interval']) * 1000)
+        self.publish(prefix + 'collector_uptime_ms',
+                     (time.time() - self.class_init_time) * 1000)
+        # Note:Both metric counts have (+2/+1) to count their own publish count
+        # Keep these metrics publish at the end to export their correct values
+        self.publish(prefix + 'total_metrics_collected', self.metric_count + 2)
+        self.publish(prefix + 'total_metrics_published',
+                     self.metric_publish_count + 1)
+    # THOUGHTSPOT_CUSTOMIZATION_END
 
     def find_binary(self, binary):
         """
