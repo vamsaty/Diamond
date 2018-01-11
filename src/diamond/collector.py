@@ -194,7 +194,7 @@ class Collector(object):
         self.metric_publish_count = 0
         self.class_init_time = time.time()
         self.run_count = 0
-        self.log.info("Initializing collector: %s with collection freq(s):%s",
+        self.log.debug("Initializing collector: %s with collection freq(s):%s",
                       self.name, self.config['interval'])
         # THOUGHTSPOT_CUSTOMIZATION_END
 
@@ -534,7 +534,7 @@ class Collector(object):
         try:
             # THOUGHTSPOT_CUSTOMIZATION_BEGIN
             self.run_count += 1
-            self.log.info("Run number#%s for %s.", self.run_count, self.name)
+            self.log.debug("Run number#%s for %s.", self.run_count, self.name)
             self.metric_count = 0
             self.metric_publish_count = 0
             # THOUGHTSPOT_CUSTOMIZATION_END
