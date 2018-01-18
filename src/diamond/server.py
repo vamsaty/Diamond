@@ -145,7 +145,7 @@ class Server(object):
                         continue
                     running_collectors.append(collector)
                 running_collectors = set(running_collectors)
-                self.log.info("Enabled collectors: %s", running_collectors)
+                self.log.debug("Enabled collectors: %s", running_collectors)
 
                 # Collectors that are running but shouldn't be
                 for process_name in running_processes - running_collectors:

@@ -569,10 +569,10 @@ class Collector(object):
         global prefix
         self.log.debug("Publishing monitoring metrics for: %s", self.name)
 
-        self.publish(prefix + 'collector_run_finished_at_ms',
-                     time.time() * 1000)
-        self.publish(prefix + 'collection_frequency_ms',
-                     int(self.config['interval']) * 1000)
+        self.publish(prefix + 'collector_run_finished_at',
+                     time.time())
+        self.publish(prefix + 'collection_frequency_s',
+                     int(self.config['interval']))
         self.publish(prefix + 'collector_uptime_ms',
                      (time.time() - self.class_init_time) * 1000)
         # Note:Both metric counts have (+2/+1) to count their own publish count
