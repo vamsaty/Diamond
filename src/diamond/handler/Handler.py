@@ -93,7 +93,7 @@ class Handler(object):
         try:
             try:
                 self.lock.acquire()
-                self.log.info("Flushing metrics: %s", self.__class__.__name__)
+                self.log.debug("Flushing metrics: %s", self.__class__.__name__)
                 self.flush()
             except Exception:
                 self.log.error(traceback.format_exc())
