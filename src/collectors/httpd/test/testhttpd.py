@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # coding=utf-8
 ################################################################################
 
@@ -10,12 +10,12 @@ from mock import patch
 
 from diamond.collector import Collector
 from httpd import HttpdCollector
-import httplib
+import http.client
 
 ################################################################################
 
 
-class TestHTTPResponse(httplib.HTTPResponse):
+class TestHTTPResponse(http.client.HTTPResponse):
     def __init__(self):
         pass
 
@@ -37,8 +37,8 @@ class TestHttpdCollector(CollectorTestCase):
 
         self.HTTPResponse = TestHTTPResponse()
 
-        httplib.HTTPConnection.request = Mock(return_value=True)
-        httplib.HTTPConnection.getresponse = Mock(
+        http.client.HTTPConnection.request = Mock(return_value=True)
+        http.client.HTTPConnection.getresponse = Mock(
             return_value=self.HTTPResponse)
 
     def test_import(self):

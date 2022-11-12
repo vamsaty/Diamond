@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # coding=utf-8
 ################################################################################
 
@@ -92,7 +92,7 @@ class TestMetric(unittest.TestCase):
             '0.0000997143369909',
         ]
 
-        for precision in xrange(0, 100):
+        for precision in range(0, 100):
             for m in metrics:
                 metric = Metric('test.723', m, timestamp=0)
 

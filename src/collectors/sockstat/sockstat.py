@@ -54,10 +54,10 @@ class SockstatCollector(diamond.collector.Collector):
         for line in file:
             match = _RE.match(line)
             if match:
-                for key, value in match.groupdict().items():
+                for key, value in list(match.groupdict().items()):
                     if value:
                         result[key] = int(value)
         file.close()
 
-        for key, value in result.items():
+        for key, value in list(result.items()):
             self.publish(key, value, metric_type='GAUGE')

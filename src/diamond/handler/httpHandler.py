@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 """
@@ -18,8 +18,8 @@ Enable this handler
 
 """
 
-from Handler import Handler
-import urllib2
+from .Handler import Handler
+import urllib.request, urllib.error, urllib.parse
 
 
 class HttpPostHandler(Handler):
@@ -69,6 +69,6 @@ class HttpPostHandler(Handler):
         self.post()
 
     def post(self):
-        req = urllib2.Request(self.url, "\n".join(self.metrics))
-        urllib2.urlopen(req)
+        req = urllib.request.Request(self.url, "\n".join(self.metrics))
+        urllib.request.urlopen(req)
         self.metrics = []

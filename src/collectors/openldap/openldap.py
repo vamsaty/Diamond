@@ -135,7 +135,7 @@ class OpenLDAPCollector(diamond.collector.Collector):
         conn.simple_bind_s(username, password)
 
         try:
-            for key in self.STATS.keys():
+            for key in list(self.STATS.keys()):
                 base = self.STATS[key]['base']
                 attr = self.STATS[key]['attr']
                 num = conn.search(base, ldap.SCOPE_BASE,
@@ -160,9 +160,9 @@ class OpenLDAPCollector(diamond.collector.Collector):
             datapoints = self.get_datapoints(ldap_url,
                                              self.config['username'],
                                              self.config['password'])
-        except Exception, e:
+        except Exception as e:
             self.log.error('Unable to query %s: %s' % (ldap_url, e))
             return {}
 
-        for name, value in datapoints.items():
+        for name, value in list(datapoints.items()):
             self.publish(name, value)

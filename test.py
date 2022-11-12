@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 ###############################################################################
 
@@ -12,14 +12,14 @@ import logging
 import configobj
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle as pickle
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 try:
     from setproctitle import setproctitle
@@ -79,7 +79,7 @@ class CollectorTestCase(unittest.TestCase):
             fp = open(filePath, 'w')
             for line in content:
                 if line.strip() == '__EXAMPLESHERE__':
-                    for metric in sorted(metrics.iterkeys()):
+                    for metric in sorted(metrics.keys()):
 
                         metricPath = 'servers.hostname.'
 
@@ -108,7 +108,7 @@ class CollectorTestCase(unittest.TestCase):
         path = os.path.join(self.getFixtureDirPath(),
                             fixture_name)
         if not os.access(path, os.R_OK):
-            print "Missing Fixture " + path
+            print("Missing Fixture " + path)
         return path
 
     def getFixture(self, fixture_name):
@@ -142,11 +142,11 @@ class CollectorTestCase(unittest.TestCase):
     def assertPublished(self, mock, key, value, expected_value=1):
         if type(mock) is list:
             for m in mock:
-                calls = (filter(lambda x: x[0][0] == key, m.call_args_list))
+                calls = ([x for x in m.call_args_list if x[0][0] == key])
                 if len(calls) > 0:
                     break
         else:
-            calls = filter(lambda x: x[0][0] == key, mock.call_args_list)
+            calls = [x for x in mock.call_args_list if x[0][0] == key]
 
         actual_value = len(calls)
         message = '%s: actual number of calls %d, expected %d' % (
@@ -178,7 +178,7 @@ class CollectorTestCase(unittest.TestCase):
         return self.assertPublishedMany(mock, dict, expected_value)
 
     def assertPublishedMany(self, mock, dict, expected_value=1):
-        for key, value in dict.iteritems():
+        for key, value in dict.items():
             self.assertPublished(mock, key, value, expected_value)
 
         if type(mock) is list:
@@ -191,8 +191,7 @@ class CollectorTestCase(unittest.TestCase):
         return self.assertPublishedMetric(mock, key, value, expected_value)
 
     def assertPublishedMetric(self, mock, key, value, expected_value=1):
-        calls = filter(lambda x: x[0][0].path.find(key) != -1,
-                       mock.call_args_list)
+        calls = [x for x in mock.call_args_list if x[0][0].path.find(key) != -1]
 
         actual_value = len(calls)
         message = '%s: actual number of calls %d, expected %d' % (
@@ -223,7 +222,7 @@ class CollectorTestCase(unittest.TestCase):
         return self.assertPublishedMetricMany(mock, dict, expected_value)
 
     def assertPublishedMetricMany(self, mock, dict, expected_value=1):
-        for key, value in dict.iteritems():
+        for key, value in dict.items():
             self.assertPublishedMetric(mock, key, value, expected_value)
 
         mock.reset_mock()
@@ -249,8 +248,8 @@ def getCollectorTests(path):
                                                      locals(),
                                                      ['*'])
             except Exception:
-                print "Failed to import module: %s. %s" % (
-                    modname, traceback.format_exc())
+                print("Failed to import module: %s. %s" % (
+                    modname, traceback.format_exc()))
                 continue
 
     for f in os.listdir(path):

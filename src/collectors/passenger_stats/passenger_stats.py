@@ -154,7 +154,7 @@ class PassengerCollector(diamond.collector.Collector):
             return {}
 
         dict_stats = self.get_passenger_memory_stats()
-        if len(dict_stats.keys()) == 0:
+        if len(list(dict_stats.keys())) == 0:
             return {}
 
         overall_cpu = self.get_passenger_cpu_usage(dict_stats)

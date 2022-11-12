@@ -38,7 +38,7 @@ def flatten_dictionary(input, sep='.', prefix=None):
       [('a.b', 10), ('c', 20)]
     """
     for name, value in sorted(input.items()):
-        fullname = sep.join(filter(None, [prefix, name]))
+        fullname = sep.join([_f for _f in [prefix, name] if _f])
         if isinstance(value, dict):
             for result in flatten_dictionary(value, sep, fullname):
                 yield result
@@ -108,7 +108,7 @@ class CephCollector(diamond.collector.Collector):
                  'perf',
                  'dump',
                  ])
-        except subprocess.CalledProcessError, err:
+        except subprocess.CalledProcessError as err:
             self.log.info('Could not get stats from %s: %s',
                           name, err)
             self.log.exception('Could not get stats from %s' % name)
@@ -116,7 +116,7 @@ class CephCollector(diamond.collector.Collector):
 
         try:
             json_data = json.loads(json_blob)
-        except Exception, err:
+        except Exception as err:
             self.log.info('Could not parse stats from %s: %s',
                           name, err)
             self.log.exception('Could not parse stats from %s' % name)

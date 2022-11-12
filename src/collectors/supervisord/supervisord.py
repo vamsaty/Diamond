@@ -27,7 +27,7 @@ xmlrpc_server_path = /var/run/supervisor.sock
 
 """
 
-import xmlrpclib
+import xmlrpc.client
 
 try:
     import supervisor.xmlrpc
@@ -66,13 +66,13 @@ class SupervisordCollector(diamond.collector.Collector):
             'Attempting to connect to XML-RPC server "%s"', uri)
 
         if protocol == 'unix':
-            server = xmlrpclib.ServerProxy(
+            server = xmlrpc.client.ServerProxy(
                 'http://127.0.0.1',
                 supervisor.xmlrpc.SupervisorTransport(None, None, uri)
                 ).supervisor
 
         elif protocol == 'http':
-            server = xmlrpclib.Server(uri).supervisor
+            server = xmlrpc.client.Server(uri).supervisor
 
         else:
             self.log.debug(

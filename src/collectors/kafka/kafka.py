@@ -8,9 +8,9 @@ Collect stats via MX4J from Kafka
  * urllib2
  * xml.etree
 """
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
-from urllib import urlencode
+from urllib.parse import urlencode
 
 try:
     from xml.etree import ElementTree
@@ -30,7 +30,7 @@ class KafkaCollector(diamond.collector.Collector):
         'double': float,
         'float': float,
         'int': int,
-        'long': long,
+        'long': int,
     }
 
     def get_default_config_help(self):
@@ -67,8 +67,8 @@ class KafkaCollector(diamond.collector.Collector):
             path, urlencode(qargs))
 
         try:
-            response = urllib2.urlopen(url)
-        except urllib2.URLError, err:
+            response = urllib.request.urlopen(url)
+        except urllib.error.URLError as err:
             self.log.error("%s: %s", url, err)
             return None
 
@@ -171,5 +171,5 @@ class KafkaCollector(diamond.collector.Collector):
             metrics.update(stats)
 
         # Publish stats
-        for metric, value in metrics.iteritems():
+        for metric, value in metrics.items():
             self.publish(metric, value)

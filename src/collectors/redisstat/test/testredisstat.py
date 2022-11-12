@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # coding=utf-8
 ################################################################################
 
@@ -243,7 +243,7 @@ class TestRedisCollector(CollectorTestCase):
             },
         }
 
-        for testname, data in testcases.items():
+        for testname, data in list(testcases.items()):
             config = get_collector_config('RedisCollector', data['config'])
 
             collector = RedisCollector(config, None)

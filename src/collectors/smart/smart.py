@@ -85,7 +85,7 @@ class SmartCollector(diamond.collector.Collector):
                     else:
                         continue
 
-                for metric in metrics.keys():
+                for metric in list(metrics.keys()):
                     self.publish(metric, metrics[metric])
 
     def find_attr_start_line(self, lines, min_line=4, max_line=9):

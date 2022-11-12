@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: fileencoding=utf-8
 #
@@ -29,12 +29,12 @@ import select
 import platform
 if platform.python_version() < '2.8.0':
     # Python 2.7 and below io.StringIO does not like unicode
-    from StringIO import StringIO
+    from io import StringIO
 else:
     try:
         from io import StringIO
     except ImportError:
-        from cStringIO import StringIO
+        from io import StringIO
 
 from datetime import datetime
 from copy import deepcopy
@@ -168,7 +168,7 @@ class Data(object):
     typeinstance = None
 
     def __init__(self, **kw):
-        [setattr(self, k, v) for k, v in kw.items()]
+        [setattr(self, k, v) for k, v in list(kw.items())]
 
     @property
     def datetime(self):
@@ -366,7 +366,7 @@ class Reader(object):
             if iterable is None:
                 return None
 
-        if isinstance(iterable, basestring):
+        if isinstance(iterable, str):
             iterable = self.decode(poll_interval, iterable)
 
         return interpret_opcodes(iterable)

@@ -116,7 +116,7 @@ class ZookeeperCollector(diamond.collector.Collector):
         hosts = self.config.get('hosts')
 
         # Convert a string config value to be an array
-        if isinstance(hosts, basestring):
+        if isinstance(hosts, str):
             hosts = [hosts]
 
         for host in hosts:
@@ -128,7 +128,7 @@ class ZookeeperCollector(diamond.collector.Collector):
             stats = self.get_stats(hostname, port)
 
             # figure out what we're configured to get, defaulting to everything
-            desired = self.config.get('publish', stats.keys())
+            desired = self.config.get('publish', list(stats.keys()))
 
             # for everything we want
             for stat in desired:

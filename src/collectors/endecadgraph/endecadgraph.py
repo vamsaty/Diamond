@@ -12,8 +12,8 @@ Renzo Toma <rtoma@bol.com>
 """
 
 import diamond.collector
-import urllib2
-from StringIO import StringIO
+import urllib.request, urllib.error, urllib.parse
+from io import StringIO
 import re
 import sys
 if sys.version_info >= (2, 5):
@@ -91,7 +91,7 @@ class EndecaDgraphCollector(diamond.collector.Collector):
             return key
 
         def processElem(elem, keyList):
-            for k, v in elem.items():
+            for k, v in list(elem.items()):
                 prefix = '.'.join(keyList)
                 if k not in self.IGNORE_ELEMENTS and self.NUMVAL_MATCH.match(v):
                     k = makeSane(k)
@@ -109,14 +109,14 @@ class EndecaDgraphCollector(diamond.collector.Collector):
                             processElem(elem, elemList)
                     elif event == 'end':
                         elemList.pop()
-            except Exception, e:
+            except Exception as e:
                 self.log.error('Something went wrong: %s', e)
 
         url = 'http://%s:%d/admin?op=stats' % (self.config['host'],
                                                self.config['port'])
         try:
-            xml = urllib2.urlopen(url, timeout=self.config['timeout']).read()
-        except Exception, e:
+            xml = urllib.request.urlopen(url, timeout=self.config['timeout']).read()
+        except Exception as e:
             self.log.error('Could not connect to endeca on %s: %s' % (url, e))
             return {}
 

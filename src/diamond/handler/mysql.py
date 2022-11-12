@@ -87,7 +87,7 @@ class MySQLHandler(Handler):
             pass
             #self.socket.sendall(data)
             # Done
-        except BaseException, e:
+        except BaseException as e:
             # Log Error
             self.log.error("MySQLHandler: Failed sending data. %s.", e)
             # Attempt to restablish connection

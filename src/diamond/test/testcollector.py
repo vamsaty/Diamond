@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # coding=utf-8
 ################################################################################
 
@@ -19,7 +19,7 @@ class BaseCollectorTest(unittest.TestCase):
             'hostname': 'custom.localhost',
         }
         c = Collector(config, [])
-        self.assertEquals('custom.localhost', c.get_hostname())
+        self.assertEqual('custom.localhost', c.get_hostname())
 
     def test_SetHostnameViaShellCmd(self):
         config = configobj.ConfigObj()
@@ -31,4 +31,4 @@ class BaseCollectorTest(unittest.TestCase):
             'hostname_method': 'shell',
         }
         c = Collector(config, [])
-        self.assertEquals('custom.localhost', c.get_hostname())
+        self.assertEqual('custom.localhost', c.get_hostname())

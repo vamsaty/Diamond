@@ -85,7 +85,7 @@ class RedisCollector(diamond.collector.Collector):
         super(RedisCollector, self).process_config()
         instance_list = self.config['instances']
         # configobj make str of single-element list, let's convert
-        if isinstance(instance_list, basestring):
+        if isinstance(instance_list, str):
             instance_list = [instance_list]
 
         # process original single redis instance
@@ -180,7 +180,7 @@ class RedisCollector(diamond.collector.Collector):
                               db=db, socket_timeout=timeout, password=auth)
             cli.ping()
             return cli
-        except Exception, ex:
+        except Exception as ex:
             self.log.error("RedisCollector: failed to connect to %s:%i. %s.",
                            host, port, ex)
 
@@ -280,6 +280,6 @@ class RedisCollector(diamond.collector.Collector):
             self.log.error('Unable to import module redis')
             return {}
 
-        for nick in self.instances.keys():
+        for nick in list(self.instances.keys()):
             (host, port, auth) = self.instances[nick]
             self.collect_instance(nick, host, int(port), auth)

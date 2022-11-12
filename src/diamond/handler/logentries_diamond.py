@@ -20,9 +20,9 @@ Enable this handler
 
 """
 
-from Handler import Handler
+from .Handler import Handler
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 from collections import deque
 
@@ -94,9 +94,9 @@ class LogentriesDiamondHandler(Handler):
             msg = json.dumps(
                 {"event": {"Timestamp": timestamp, "Host": metric.host,
                            topic: value, }})
-            req = urllib2.Request("https://js.logentries.com/v1/logs/"
+            req = urllib.request.Request("https://js.logentries.com/v1/logs/"
                                   + self.log_token, msg)
             try:
-                urllib2.urlopen(req)
-            except urllib2.URLError, e:
+                urllib.request.urlopen(req)
+            except urllib.error.URLError as e:
                 logging.error("Can't send log message to Logentries %s", e)
