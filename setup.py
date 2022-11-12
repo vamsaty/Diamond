@@ -44,13 +44,13 @@ else:
 
     if hasattr(platform, 'dist'):
         distro = platform.dist()[0].lower()
-        distro_major_version = int(platform.dist()[1].split('.')[0])
+        distro_major_version = platform.dist()[1].split('.')[0]
     else:
         import pip
         pip.main(['install', 'distro', ]) 
         import distro as Distro
         distro = Distro.name().lower()
-        distro_major_version = int(Distro.version_parts()[0])
+        distro_major_version = Distro.version_parts()[0]
 
     if not distro:
         if 'amzn' in platform.uname()[2]:
