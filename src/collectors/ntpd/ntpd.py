@@ -95,7 +95,7 @@ class NtpdCollector(diamond.collector.Collector):
             if data['when'].endswith(('m', 'h', 'd')):
                 data['when'] = convert_to_second(data['when'])
 
-        return data.items()
+        return list(data.items())
 
     def get_ntpdc_output(self):
         return self.run_command([self.config['ntpdc_bin'], '-c', 'kerninfo'])
@@ -118,7 +118,7 @@ class NtpdCollector(diamond.collector.Collector):
             elif key == 'estimated error':
                 data['est_error'] = val
 
-        return data.items()
+        return list(data.items())
 
     def collect(self):
         for stat, val in self.get_ntpq_stats():

@@ -25,7 +25,7 @@ See https://github.com/emicklei/jcollectd for an up-to-date jcollect fork.
 
 import threading
 import re
-import Queue
+import queue
 
 import diamond.collector
 import diamond.metric
@@ -63,7 +63,7 @@ class JCollectdCollector(diamond.collector.Collector):
             try:
                 dp = q.get(False)
                 metric = self.make_metric(dp)
-            except Queue.Empty:
+            except queue.Empty:
                 break
             self.publish_metric(metric)
 
@@ -117,7 +117,7 @@ class ListenerThread(threading.Thread):
         self.log = log
         self.poll_interval = poll_interval
 
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
 
     def run(self):
         self.log.info('ListenerThread started on {0}:{1}(udp)'.format(
@@ -130,9 +130,9 @@ class ListenerThread(threading.Thread):
                 try:
                     items = rdr.interpret(poll_interval=self.poll_interval)
                     self.send_to_collector(items)
-                except ValueError, e:
+                except ValueError as e:
                     self.log.warn('Dropping bad packet: {0}'.format(e))
-        except Exception, e:
+        except Exception as e:
             self.log.error('caught exception: type={0}, exc={1}'.format(type(e),
                                                                         e))
 
@@ -146,9 +146,9 @@ class ListenerThread(threading.Thread):
             try:
                 metric = self.transform(item)
                 self.queue.put(metric)
-            except Queue.Full:
+            except queue.Full:
                 self.log.error('Queue to collector is FULL')
-            except Exception, e:
+            except Exception as e:
                 self.log.error('B00M! type={0}, exception={1}'.format(type(e),
                                                                       e))
 

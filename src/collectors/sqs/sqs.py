@@ -62,7 +62,7 @@ class SqsCollector(diamond.collector.Collector):
         if not sqs:
             self.log.error("boto module not found!")
             return
-        for (region, region_cfg) in self.config['regions'].items():
+        for (region, region_cfg) in list(self.config['regions'].items()):
             assert 'access_key_id' in region_cfg
             assert 'secret_access_key' in region_cfg
             assert 'queues' in region_cfg

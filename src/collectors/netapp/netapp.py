@@ -224,11 +224,11 @@ class NetAppCollector(diamond.collector.Collector):
         shortpath = ".".join(path.split(".")[:-1])
         basename = path.split(".")[-1]
         secondary_delta = None
-        if basename in self.DIVIDERS.keys():
+        if basename in list(self.DIVIDERS.keys()):
             mateKey = ".".join([shortpath, self.DIVIDERS[basename]])
         else:
             return
-        if mateKey in derivative.keys():
+        if mateKey in list(derivative.keys()):
             secondary_delta = derivative[mateKey]
         else:
             return
@@ -271,7 +271,7 @@ class NetAppCollector(diamond.collector.Collector):
 
         # We're only able to query a single object at a time,
         # so we'll loop over the objects.
-        for na_object in self.METRICS.keys():
+        for na_object in list(self.METRICS.keys()):
 
             # For easy reference later, generate a new dict for this object
             LOCALMETRICS = {}
@@ -284,7 +284,7 @@ class NetAppCollector(diamond.collector.Collector):
             # Keep track of how long has passed since we checked last
             CollectTime = time.time()
             time_delta = None
-            if na_object in self.LastCollectTime.keys():
+            if na_object in list(self.LastCollectTime.keys()):
                 time_delta = CollectTime - self.LastCollectTime[na_object]
             self.LastCollectTime[na_object] = CollectTime
 
@@ -292,7 +292,7 @@ class NetAppCollector(diamond.collector.Collector):
             query = NaServer.NaElement("perf-object-get-instances-iter-start")
             query.child_add_string("objectname", na_object)
             counters = NaServer.NaElement("counters")
-            for metric in LOCALMETRICS.keys():
+            for metric in list(LOCALMETRICS.keys()):
                 counters.child_add_string("counter", metric)
             query.child_add(counters)
 
@@ -319,8 +319,8 @@ class NetAppCollector(diamond.collector.Collector):
                 res = server.invoke_elem(query)
 
                 if(res.results_status() == "failed"):
-                    print "Connection to filer %s failed; %s" % (
-                        device, res.results_reason())
+                    print("Connection to filer %s failed; %s" % (
+                        device, res.results_reason()))
                     return
 
                 num_records = res.child_get_int("records")
@@ -368,17 +368,17 @@ class NetAppCollector(diamond.collector.Collector):
             # and saves a new point, we'll need to store all derivatives
             # for local reference.
             derivative = {}
-            for key in raw.keys():
+            for key in list(raw.keys()):
                 derivative[key] = self.derivative(key, raw[key])
 
-            for key in raw.keys():
+            for key in list(raw.keys()):
                 metricname = key.split(".")[-1]
                 prettyname = LOCALMETRICS[metricname]["prettyname"]
                 multiplier = LOCALMETRICS[metricname]["multiplier"]
 
                 if metricname in self.DROPMETRICS:
                     continue
-                elif metricname in self.DIVIDERS.keys():
+                elif metricname in list(self.DIVIDERS.keys()):
                     self._gen_delta_depend(key, derivative, multiplier,
                                            prettyname, device)
                 else:

@@ -27,7 +27,7 @@ following content:
 
 """
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 import diamond.collector
 
@@ -58,11 +58,11 @@ class NginxCollector(diamond.collector.Collector):
         connectionStatusRE = re.compile('Reading: (?P<reading>\d+) '
                                         + 'Writing: (?P<writing>\d+) '
                                         + 'Waiting: (?P<waiting>\d+)')
-        req = urllib2.Request('http://%s:%i%s' % (self.config['req_host'],
+        req = urllib.request.Request('http://%s:%i%s' % (self.config['req_host'],
                                                   int(self.config['req_port']),
                                                   self.config['req_path']))
         try:
-            handle = urllib2.urlopen(req)
+            handle = urllib.request.urlopen(req)
             for l in handle.readlines():
                 l = l.rstrip('\r\n')
                 if activeConnectionsRE.match(l):
@@ -81,10 +81,10 @@ class NginxCollector(diamond.collector.Collector):
                     self.publish_gauge('act_reads', int(m.group('reading')))
                     self.publish_gauge('act_writes', int(m.group('writing')))
                     self.publish_gauge('act_waits', int(m.group('waiting')))
-        except IOError, e:
+        except IOError as e:
             self.log.error("Unable to open http://%s:%i%s",
                            self.config['req_host'],
                            int(self.config['req_port']),
                            self.config['req_path'])
-        except Exception, e:
+        except Exception as e:
             self.log.error("Unknown error opening url: %s", e)

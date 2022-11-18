@@ -48,9 +48,9 @@ def setup_logging(configfile, stdout=False):
                 # default was to always disable them, in our case we want to
                 # keep any logger created by handlers
                 logging.config.fileConfig(configfile)
-                for logger in logging.root.manager.loggerDict.values():
+                for logger in list(logging.root.manager.loggerDict.values()):
                     logger.disabled = 0
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write("Error occurs when initialize logging: ")
             sys.stderr.write(str(e))
             sys.stderr.write(os.linesep)

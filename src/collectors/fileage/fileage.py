@@ -51,7 +51,7 @@ class FileAgeCollector(diamond.collector.Collector):
 
     def collect(self):
         paths = self.config.get('paths')
-	if isinstance(paths, basestring):
+	if isinstance(paths, str):
             paths = [paths]
 
 	for path in paths:
@@ -62,7 +62,7 @@ class FileAgeCollector(diamond.collector.Collector):
 	    	try:
 			filename = os.path.basename(path)
 			alias = filename.replace (".","_")
-	    	except Exception, e:
+	    	except Exception as e:
 			self.log.error('Could not derive bucket name: %s', e)	
 			continue
 	    try:

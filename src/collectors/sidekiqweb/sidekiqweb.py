@@ -15,7 +15,7 @@ try:
 except ImportError:
     import simplejson as json
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import diamond.collector
 
 
@@ -40,22 +40,22 @@ class SidekiqWebCollector(diamond.collector.Collector):
 
     def collect(self):
         try:
-            response = urllib2.urlopen("http://%s:%s/dashboard/stats" % (
+            response = urllib.request.urlopen("http://%s:%s/dashboard/stats" % (
                 self.config['host'], int(self.config['port'])))
-        except Exception, e:
+        except Exception as e:
             self.log.error('Couldnt connect to sidekiq-web: %s', e)
             return {}
 
         try:
             j = json.loads(response.read())
-        except Exception, e:
+        except Exception as e:
             self.log.error('Couldnt parse json: %s', e)
             return {}
 
         for k in j:
-            for item, value in j[k].items():
+            for item, value in list(j[k].items()):
 
-                if isinstance(value, (str, unicode)) and 'M' in value:
+                if isinstance(value, str) and 'M' in value:
                     value = float(value.replace('M', ''))
                     for unit in self.config['byte_unit']:
                         unit_value = diamond.convertor.binary.convert(

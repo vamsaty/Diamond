@@ -9,7 +9,7 @@ Collects data for Resque Web
 
 """
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import diamond.collector
 
 
@@ -35,9 +35,9 @@ class ResqueWebCollector(diamond.collector.Collector):
 
     def collect(self):
         try:
-            response = urllib2.urlopen("http://%s:%s/stats.txt" % (
+            response = urllib.request.urlopen("http://%s:%s/stats.txt" % (
                 self.config['host'], int(self.config['port'])))
-        except Exception, e:
+        except Exception as e:
             self.log.error('Couldnt connect to resque-web: %s', e)
             return {}
 
@@ -58,5 +58,5 @@ class ResqueWebCollector(diamond.collector.Collector):
                 else:
                     self.publish("queue.%s.current" % queue, count)
 
-            except Exception, e:
+            except Exception as e:
                 self.log.error('Couldnt parse the queue: %s', e)

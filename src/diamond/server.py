@@ -1,6 +1,6 @@
 # coding=utf-8
 
-import logging
+from . import logging
 import multiprocessing
 import os
 import signal
@@ -80,10 +80,10 @@ class Server(object):
 
         if 'handlers_path' in self.config['server']:
             # Make an list if not one
-            if isinstance(self.config['server']['handlers_path'], basestring):
+            if isinstance(self.config['server']['handlers_path'], str):
                 handlers_path = self.config['server']['handlers_path']
                 handlers_path = handlers_path.split(',')
-                handlers_path = map(str.strip, handlers_path)
+                handlers_path = list(map(str.strip, handlers_path))
                 self.config['server']['handlers_path'] = handlers_path
 
             load_include_path(handlers_path)
@@ -93,7 +93,7 @@ class Server(object):
             sys.exit(1)
 
         handlers = self.config['server'].get('handlers')
-        if isinstance(handlers, basestring):
+        if isinstance(handlers, str):
             handlers = [handlers]
 
         # Prevent the Queue Handler from being a normal handler
@@ -140,7 +140,7 @@ class Server(object):
                 ##############################################################
 
                 running_collectors = []
-                for collector, config in self.config['collectors'].iteritems():
+                for collector, config in self.config['collectors'].items():
                     if config.get('enabled', False) is not True:
                         continue
                     running_collectors.append(collector)
@@ -165,7 +165,7 @@ class Server(object):
                         continue
 
                     # Find the class
-                    for cls in collectors.values():
+                    for cls in list(collectors.values()):
                         cls_name = cls.__name__.split('.')[-1]
                         if cls_name == collector_name:
                             break

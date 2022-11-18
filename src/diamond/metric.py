@@ -2,8 +2,8 @@
 
 import time
 import re
-import logging
-from error import DiamondException
+from . import logging
+from .error import DiamondException
 
 
 class Metric(object):
@@ -38,7 +38,7 @@ class Metric(object):
             if not isinstance(timestamp, int):
                 try:
                     timestamp = int(timestamp)
-                except ValueError, e:
+                except ValueError as e:
                     raise DiamondException(("Invalid timestamp when "
                                             "creating new Metric %r: %s")
                                            % (path, e))
@@ -51,7 +51,7 @@ class Metric(object):
                     value = round(float(value))
                 else:
                     value = float(value)
-            except ValueError, e:
+            except ValueError as e:
                 raise DiamondException(("Invalid value when creating new "
                                         "Metric %r: %s") % (path, e))
 
@@ -68,7 +68,7 @@ class Metric(object):
         """
         Return the Metric as a string
         """
-        if not isinstance(self.precision, (int, long)):
+        if not isinstance(self.precision, int):
             log = logging.getLogger('diamond')
             log.warn('Metric %s does not have a valid precision', self.path)
             self.precision = 0

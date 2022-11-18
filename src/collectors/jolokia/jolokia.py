@@ -35,8 +35,8 @@ JolokiaCollector.conf
 import diamond.collector
 import json
 import re
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 
 class JolokiaCollector(diamond.collector.Collector):
@@ -76,7 +76,7 @@ class JolokiaCollector(diamond.collector.Collector):
     def process_config(self):
         super(JolokiaCollector, self).process_config()
         self.mbeans = []
-        if isinstance(self.config['mbeans'], basestring):
+        if isinstance(self.config['mbeans'], str):
             for mbean in self.config['mbeans'].split('|'):
                 self.mbeans.append(mbean.strip())
         elif isinstance(self.config['mbeans'], list):
@@ -92,11 +92,11 @@ class JolokiaCollector(diamond.collector.Collector):
         listing = self.list_request()
         try:
             domains = listing['value'] if listing['status'] == 200 else {}
-            for domain in domains.keys():
+            for domain in list(domains.keys()):
                 if domain not in self.IGNORE_DOMAINS:
                     obj = self.read_request(domain)
                     mbeans = obj['value'] if obj['status'] == 200 else {}
-                    for k, v in mbeans.iteritems():
+                    for k, v in mbeans.items():
                         if self.check_mbean(k):
                             self.collect_bean(k, v)
         except KeyError:
@@ -111,20 +111,20 @@ class JolokiaCollector(diamond.collector.Collector):
         try:
             url = "http://%s:%s/%s" % (self.config['host'],
                                        self.config['port'], self.LIST_URL)
-            response = urllib2.urlopen(url)
+            response = urllib.request.urlopen(url)
             return self.read_json(response)
-        except (urllib2.HTTPError, ValueError):
+        except (urllib.error.HTTPError, ValueError):
             self.log.error('Unable to read JSON response.')
             return {}
 
     def read_request(self, domain):
         try:
-            url_path = self.READ_URL % urllib.quote(domain)
+            url_path = self.READ_URL % urllib.parse.quote(domain)
             url = "http://%s:%s/%s" % (self.config['host'],
                                        self.config['port'], url_path)
-            response = urllib2.urlopen(url)
+            response = urllib.request.urlopen(url)
             return self.read_json(response)
-        except (urllib2.HTTPError, ValueError):
+        except (urllib.error.HTTPError, ValueError):
             self.log.error('Unable to read JSON response.')
             return {}
 
@@ -135,8 +135,8 @@ class JolokiaCollector(diamond.collector.Collector):
         return text
 
     def collect_bean(self, prefix, obj):
-        for k, v in obj.iteritems():
-            if type(v) in [int, float, long]:
+        for k, v in obj.items():
+            if type(v) in [int, float, int]:
                 key = "%s.%s" % (prefix, k)
                 key = self.clean_up(key)
                 self.publish(key, v)

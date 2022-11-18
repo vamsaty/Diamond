@@ -62,5 +62,5 @@ class VMStatCollector(diamond.collector.Collector):
         # Close file
         file.close()
 
-        for key, value in results.items():
+        for key, value in list(results.items()):
             self.publish(key, value, 2)

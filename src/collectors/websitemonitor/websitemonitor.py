@@ -7,7 +7,7 @@ Gather HTTP Response code and Duration of HTTP request
 
 """
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 from datetime import datetime
 import diamond.collector
@@ -37,7 +37,7 @@ class WebsiteMonitorCollector(diamond.collector.Collector):
         return default_config
 
     def collect(self):
-        req = urllib2.Request('%s' % (self.config['URL']))
+        req = urllib.request.Request('%s' % (self.config['URL']))
 
         try:
             # time in seconds since epoch as a floating number
@@ -47,7 +47,7 @@ class WebsiteMonitorCollector(diamond.collector.Collector):
                                         ).strftime('%B %d, %Y %H:%M:%S')
             self.log.debug('Start time: %s' % (st))
 
-            resp = urllib2.urlopen(req)
+            resp = urllib.request.urlopen(req)
             # time in seconds since epoch as a floating number
             end_time = time.time()
             # human-readable end time e.eg. November 25, 2013 18:15:56
@@ -59,7 +59,7 @@ class WebsiteMonitorCollector(diamond.collector.Collector):
             self.publish('response_time.%s' % (resp.code), rt,
                          metric_type='COUNTER')
         # urllib2 will puke on non HTTP 200/OK URLs
-        except urllib2.URLError, e:
+        except urllib.error.URLError as e:
             if e.code != 200:
                 # time in seconds since epoch as a floating number
                 end_time = time.time()
@@ -70,8 +70,8 @@ class WebsiteMonitorCollector(diamond.collector.Collector):
                 self.publish('response_time.%s' % (e.code), rt,
                              metric_type='COUNTER')
 
-        except IOError, e:
+        except IOError as e:
             self.log.error('Unable to open %s' % (self.config['URL']))
 
-        except Exception, e:
+        except Exception as e:
             self.log.error("Unknown error opening url: %s", e)
