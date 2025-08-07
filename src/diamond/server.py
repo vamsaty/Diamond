@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from . import logging
+import logging
 import multiprocessing
 import os
 import signal
