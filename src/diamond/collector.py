@@ -7,7 +7,7 @@ The Collector class is a base class for all metric collectors.
 import os
 import socket
 import platform
-from . import logging
+import logging
 import configobj
 import time
 import re
