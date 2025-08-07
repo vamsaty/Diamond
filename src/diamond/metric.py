@@ -2,7 +2,7 @@
 
 import time
 import re
-from . import logging
+import logging
 from .error import DiamondException
 
 
